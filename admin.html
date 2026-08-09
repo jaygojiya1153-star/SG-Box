@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — SG92 Box Cricket Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+
+<!-- ===== LOGIN VIEW ===== -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="brand">SG92<span class="dot">•</span>ARENA</div>
+    <p class="sub">Staff / Admin sign-in</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email (Admin ID)</label>
+        <input type="email" id="loginEmail" placeholder="admin@sg92arena.in" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      <div class="form-error" id="loginError"></div>
+    </form>
+    <p style="text-align:center; margin-top:18px;"><a href="index.html" style="color:var(--text-faint); font-size:13px;">← Back to site</a></p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD VIEW ===== -->
+<div class="admin-shell" id="dashView" style="display:none;">
+  <aside class="admin-side">
+    <div class="brand">SG92<span class="dot">•</span>ARENA</div>
+    <a href="#" class="nav-item active" data-panel="panelOverview">Overview</a>
+    <a href="#" class="nav-item" data-panel="panelSlots">Manage Slots</a>
+    <a href="#" class="nav-item" data-panel="panelPricing">Pricing Bands</a>
+    <a href="#" class="nav-item" data-panel="panelSettings">Settings</a>
+    <button id="logoutBtn" style="margin-top:auto;">Log Out ↩</button>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h2 style="font-size:26px;">Dashboard</h2>
+      <span id="adminEmailTag" style="font-family:var(--font-mono); font-size:12px; color:var(--text-faint);"></span>
+    </div>
+
+    <!-- Overview -->
+    <section id="panelOverview" class="panel">
+      <div class="admin-grid">
+        <div class="admin-card kpi"><div class="val" id="kpiTotal">–</div><div class="lab">Slots Today</div></div>
+        <div class="admin-card kpi"><div class="val" id="kpiOpen">–</div><div class="lab">Open</div></div>
+        <div class="admin-card kpi"><div class="val" id="kpiFilling">–</div><div class="lab">Filling Fast</div></div>
+        <div class="admin-card kpi"><div class="val" id="kpiBooked">–</div><div class="lab">Booked</div></div>
+      </div>
+      <div class="admin-card" style="margin-top:22px;">
+        <h3>Today's Board</h3>
+        <table>
+          <thead><tr><th>Time</th><th>Band</th><th>Demand %</th><th>Status</th><th>Price</th></tr></thead>
+          <tbody id="overviewTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Manage Slots -->
+    <section id="panelSlots" class="panel" style="display:none;">
+      <div class="admin-card">
+        <h3>Add / Update Slot</h3>
+        <form id="slotForm">
+          <div class="admin-grid">
+            <div class="field"><label>Date</label><input type="date" id="slotDate" required></div>
+            <div class="field"><label>Time Range</label><input type="text" id="slotTime" placeholder="18:00 - 19:00" required></div>
+            <div class="field">
+              <label>Band</label>
+              <select id="slotBand">
+                <option value="morning">Morning</option>
+                <option value="afternoon">Afternoon</option>
+                <option value="evening">Evening</option>
+                <option value="night">Night</option>
+              </select>
+            </div>
+            <div class="field"><label>Base Price (₹)</label><input type="number" id="slotBasePrice" required></div>
+            <div class="field">
+              <label>Status</label>
+              <select id="slotStatus">
+                <option value="open">Open</option>
+                <option value="filling">Filling Fast</option>
+                <option value="booked">Booked</option>
+              </select>
+            </div>
+            <div class="field"><label>Demand % (drives surge + "Recommended" badge)</label><input type="number" id="slotDemand" min="0" max="100" value="0"></div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Slot</button>
+          <input type="hidden" id="slotEditId">
+        </form>
+      </div>
+      <div class="admin-card">
+        <h3>All Slots (Today)</h3>
+        <table>
+          <thead><tr><th>Time</th><th>Band</th><th>Base ₹</th><th>Demand</th><th>Status</th><th></th></tr></thead>
+          <tbody id="slotsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Pricing Bands -->
+    <section id="panelPricing" class="panel" style="display:none;">
+      <div class="admin-card">
+        <h3>Time Band Pricing & Surge Rules</h3>
+        <p style="color:var(--text-dim); font-size:13.5px; margin-bottom:16px;">These are the default rates shown on the public pricing table. Individual slot prices in "Manage Slots" can still override them.</p>
+        <table>
+          <thead><tr><th>Band</th><th>Window</th><th>Base ₹/hr</th><th>Surge Threshold</th><th>Surge Multiplier</th></tr></thead>
+          <tbody>
+            <tr><td>Morning</td><td>6 AM – 12 PM</td><td>₹700</td><td>70% booked</td><td>1.10×</td></tr>
+            <tr><td>Afternoon</td><td>12 PM – 5 PM</td><td>₹600</td><td>70% booked</td><td>1.10×</td></tr>
+            <tr><td>Evening</td><td>5 PM – 10 PM</td><td>₹1,000</td><td>70% booked</td><td>1.25×</td></tr>
+            <tr><td>Night</td><td>10 PM – 1 AM</td><td>₹800</td><td>70% booked</td><td>1.15×</td></tr>
+          </tbody>
+        </table>
+        <p style="color:var(--text-faint); font-size:12.5px; margin-top:14px;">To change these numbers permanently, edit the <code>SURGE_RULES</code> object in <code>js/main.js</code> and the table in <code>index.html</code>. A future version can move this fully into Firestore too.</p>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="panelSettings" class="panel" style="display:none;">
+      <div class="admin-card">
+        <h3>WhatsApp & Business Info</h3>
+        <p style="color:var(--text-dim); font-size:13.5px;">These values live in <code>js/firebase-config.js</code> under <code>BUSINESS</code> — update the WhatsApp number, ground name, and default message there so every button on the site stays in sync.</p>
+      </div>
+      <div class="admin-card">
+        <h3>Add another admin</h3>
+        <p style="color:var(--text-dim); font-size:13.5px;">Go to Firebase Console → Authentication → Users → Add User to create more staff logins with their own email + password.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
